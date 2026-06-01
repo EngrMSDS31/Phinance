@@ -23,7 +23,7 @@ import {
   getGetPortfolioSummaryQueryKey,
   getListHoldingsQueryKey,
   getListTransactionsQueryKey,
-} from "@workspace/api-client-react";
+} from "../../../lib/api-client-react/src";
 import { formatCurrency, formatPercent, cnValue, formatNumber, getNetAmount } from "@/lib/format";
 import { SensitiveAmount } from "@/components/amount";
 import { computeFIFO } from "@/lib/fifo";
