@@ -10,7 +10,7 @@ import {
   useListTransactions,
   getListHoldingsQueryKey,
   getListTransactionsQueryKey,
-} from "@workspace/api-client-react";
+} from "../../../lib/api-client-react/src";
 
 import { computeXIRR } from "@/lib/fifo";
 import { computePortfolioMetrics } from "@/lib/portfolioEngine";
