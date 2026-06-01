@@ -4,7 +4,7 @@ import {
   useListPortfolios, useListHoldings, useCreateTransaction, useSearchSymbols,
   getGetDashboardSummaryQueryKey, getGetDashboardAllocationQueryKey,
   getListHoldingsQueryKey, getListTransactionsQueryKey,
-} from "@workspace/api-client-react";
+} from "../../../lib/api-client-react/src";
 import { formatPercent, cnValue } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
