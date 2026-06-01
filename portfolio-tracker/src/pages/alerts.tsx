@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useListAlerts, useCreateAlert, useDeleteAlert, useSearchSymbols, getListAlertsQueryKey } from "@workspace/api-client-react";
+import { useListAlerts, useCreateAlert, useDeleteAlert, useSearchSymbols, getListAlertsQueryKey } from "../../../lib/api-client-react/src";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/format";
