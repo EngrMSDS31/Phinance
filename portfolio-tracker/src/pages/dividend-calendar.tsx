@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useListDividendEvents, useCreateTransaction, useListPortfolios, useDeleteTransaction, useUpdateTransaction } from "@workspace/api-client-react";
+import { useListDividendEvents, useCreateTransaction, useListPortfolios, useDeleteTransaction, useUpdateTransaction } from "../../../lib/api-client-react/src";
 import { formatCurrency } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, getDay, subMonths, addMonths } from "date-fns";
