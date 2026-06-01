@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useImportCsv, useListPortfolios } from "@workspace/api-client-react";
+import { useImportCsv, useListPortfolios } from "../../../lib/api-client-react/src";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download, Upload, Eye, FolderOpen, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
