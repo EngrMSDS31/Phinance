@@ -9,7 +9,7 @@ import {
   MessageSquare, ArrowLeftRight, Eye, EyeOff, Check,
 } from "lucide-react";
 import { usePrivacy } from "@/lib/privacy-context";
-import { useGetDashboardSummary } from "@workspace/api-client-react";
+import { useGetDashboardSummary } from "../../../lib/api-client-react/src";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
