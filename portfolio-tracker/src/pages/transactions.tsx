@@ -10,7 +10,7 @@ import {
   useSearchSymbols,
   getListHoldingsQueryKey,
   getListTransactionsQueryKey,
-} from "@workspace/api-client-react";
+} from "../../../lib/api-client-react/src";
 import { formatCurrency, formatNumber, getNetAmount } from "@/lib/format";
 import { SensitiveAmount } from "@/components/amount";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
