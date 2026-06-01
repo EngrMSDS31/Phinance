@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useListPortfolios, useCreatePortfolio, useDeletePortfolio, useUpdatePortfolio, getListPortfoliosQueryKey, useGetPortfolioSummary, getGetPortfolioSummaryQueryKey, useListHoldings, getListHoldingsQueryKey, useListTransactions, getListTransactionsQueryKey } from "@workspace/api-client-react";
-import { computePortfolioMetrics } from "@/lib/portfolioEngine";
+import { useListPortfolios, useCreatePortfolio, useDeletePortfolio, useUpdatePortfolio, getListPortfoliosQueryKey, useGetPortfolioSummary, getGetPortfolioSummaryQueryKey, useListHoldings, getListHoldingsQueryKey, useListTransactions, getListTransactionsQueryKey } from "../../../lib/api-client-react/src";
 import { useFx } from "@/lib/fx-context";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
