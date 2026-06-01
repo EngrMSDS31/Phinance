@@ -40,6 +40,7 @@ export default defineConfig({
       "@workspace/api-client-react": path.resolve(
   import.meta.dirname,
   "..",
+  "..",
   "lib",
   "api-client-react",
   "src",
