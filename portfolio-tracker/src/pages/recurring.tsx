@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { useListPortfolios } from "@workspace/api-client-react";
+import { useListPortfolios } from "../../../lib/api-client-react/src";
 import { formatDistanceToNow, format, parseISO, isPast, isToday } from "date-fns";
 import { Plus, Play, Pause, Trash2, RefreshCw, CalendarClock, TrendingUp, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
