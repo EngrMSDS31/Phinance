@@ -8,7 +8,7 @@ import {
   useSearchSymbols,
   getListWatchlistsQueryKey,
   getListWatchlistItemsQueryKey,
-} from "@workspace/api-client-react";
+} from "../../../lib/api-client-react/src";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
