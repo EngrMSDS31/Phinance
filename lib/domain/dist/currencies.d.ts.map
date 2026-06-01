@@ -1,0 +1,1 @@
+{"version":3,"file":"currencies.d.ts","sourceRoot":"","sources":["../src/currencies.ts"],"names":[],"mappings":"AAAA,4EAA4E;AAC5E,eAAO,MAAM,oBAAoB,+FAavB,CAAC;AAEX,MAAM,MAAM,iBAAiB,GAAG,CAAC,OAAO,oBAAoB,CAAC,CAAC,MAAM,CAAC,CAAC;AAEtE,eAAO,MAAM,gBAAgB,EAAE,iBAAyB,CAAC;AAEzD,gEAAgE;AAChE,wBAAgB,wBAAwB,CAAC,MAAM,EAAE,MAAM,GAAG,IAAI,GAAG,SAAS,GAAG,iBAAiB,CAW7F"}
