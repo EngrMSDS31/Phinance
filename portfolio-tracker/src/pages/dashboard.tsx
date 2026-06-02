@@ -439,19 +439,37 @@ const PIE_COLORS = [
 
 export default function Dashboard() {
   const { fxFormat, displayCurrency, convert } = useFx();
-  const { data: portfolios } = useListPortfolios();
+  const { data: portfoliosData } = useListPortfolios();
 
   const params = { targetCurrency: displayCurrency };
   const { data: summary, isLoading: loadingSummary } = useGetDashboardSummary(params);
-  const { data: allocation, isLoading: loadingAllocation } = useGetDashboardAllocation(params);
-  const { data: upcomingDividends, isLoading: loadingDividends } = useGetUpcomingDividends();
+  const { data: allocationData, isLoading: loadingAllocation } = useGetDashboardAllocation(params);
+  const { data: upcomingDividendsData, isLoading: loadingDividends } = useGetUpcomingDividends();
+
+  const portfolios = Array.isArray(portfoliosData)
+    ? portfoliosData
+    : Array.isArray((portfoliosData as any)?.data)
+      ? (portfoliosData as any).data
+      : [];
+
+  const allocation = Array.isArray(allocationData)
+    ? allocationData
+    : Array.isArray((allocationData as any)?.data)
+      ? (allocationData as any).data
+      : [];
+
+  const upcomingDividends = Array.isArray(upcomingDividendsData)
+    ? upcomingDividendsData
+    : Array.isArray((upcomingDividendsData as any)?.data)
+      ? (upcomingDividendsData as any).data
+      : [];
 
   const fmt = (v: number) => fxFormat(v, displayCurrency);
 
-  const allPortfolioIds = useMemo(() => portfolios?.map(p => p.id) ?? [], [portfolios]);
+  const allPortfolioIds = useMemo(() => portfolios.map(p => p.id), [portfolios]);
 
   const fxTotalCash = useMemo(
-    () => portfolios?.reduce((sum, p) => sum + convert(p.cashBalance, p.baseCurrency), 0) ?? 0,
+    () => portfolios.reduce((sum, p) => sum + convert(p.cashBalance, p.baseCurrency), 0),
     [portfolios, convert]
   );
 
