@@ -40,7 +40,7 @@ import { Plus, RefreshCw, Search, X, ChevronLeft } from "lucide-react";
 import { useQueryClient, useQueries } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
-const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+const BASE_URL = import.meta.env.BASE_URL?.replace(//$/, "") || "";
 
 type DashSymbol = {
   id?: number;
@@ -53,6 +53,7 @@ function toArray<T = any>(value: any): T[] {
   if (Array.isArray(value)) return value;
   if (Array.isArray(value?.data)) return value.data;
   if (Array.isArray(value?.items)) return value.items;
+  if (Array.isArray(value?.results)) return value.results;
   return [];
 }
 
@@ -92,7 +93,11 @@ function MetricCard({
           <div className="text-[10px] md:text-xs mt-1 leading-tight">{subtitleNode}</div>
         )}
         {subtitle && !subtitleNode && !loading && (
-          <div className={`text-[10px] md:text-xs mt-1 leading-tight ${subtitleClass ?? "text-muted-foreground"}`}>
+          <div
+            className={`text-[10px] md:text-xs mt-1 leading-tight ${
+              subtitleClass ?? "text-muted-foreground"
+            }`}
+          >
             {subtitle}
           </div>
         )}
@@ -137,7 +142,9 @@ function DashboardAddTransactionDialog() {
   const [txNotes, setTxNotes] = useState("");
   const [txCurrency, setTxCurrency] = useState("USD");
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
-  const [priceStatus, setPriceStatus] = useState<"live" | "delayed" | "lastclose" | "unavailable" | null>(null);
+  const [priceStatus, setPriceStatus] = useState<
+    "live" | "delayed" | "lastclose" | "unavailable" | null
+  >(null);
   const [priceLabel, setPriceLabel] = useState<string | null>(null);
 
   useEffect(() => {
@@ -160,7 +167,7 @@ function DashboardAddTransactionDialog() {
   const existingMatches =
     debouncedQuery.length >= 1
       ? holdings.filter((h: any) =>
-          h.symbol.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+          h.symbol?.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
           (h.name ?? "").toLowerCase().includes(debouncedQuery.toLowerCase())
         )
       : [];
@@ -212,11 +219,12 @@ function DashboardAddTransactionDialog() {
       });
 
       if (res.ok) {
-        const rows = toArray<any>(await res.json());
+        const raw = await res.json();
+        const rows = toArray<any>(raw);
         const r = rows[0];
 
         if (r?.price > 0) {
-          setTxPrice(r.price.toFixed(4));
+          setTxPrice(Number(r.price).toFixed(4));
           const lbl: string = r.priceLabel ?? (r.isStale ? "Last Price" : "Delayed");
           setPriceLabel(lbl);
 
@@ -343,19 +351,32 @@ function DashboardAddTransactionDialog() {
           qc.invalidateQueries({ queryKey: getGetDashboardSummaryQueryKey() });
           qc.invalidateQueries({ queryKey: getGetDashboardAllocationQueryKey() });
         },
-        onError: () =>
-          toast({ title: "Failed to add transaction", variant: "destructive" }),
+        onError: () => {
+          toast({ title: "Failed to add transaction", variant: "destructive" });
+        },
       }
     );
   };
 
   return (
     <>
-      <Button size="sm" onClick={() => { resetAll(); setOpen(true); }}>
+      <Button
+        size="sm"
+        onClick={() => {
+          resetAll();
+          setOpen(true);
+        }}
+      >
         <Plus className="w-4 h-4 mr-2" /> Add Transaction
       </Button>
 
-      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetAll(); }}>
+      <Dialog
+        open={open}
+        onOpenChange={(v) => {
+          setOpen(v);
+          if (!v) resetAll();
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -367,13 +388,16 @@ function DashboardAddTransactionDialog() {
                   <ChevronLeft className="w-4 h-4" />
                 </button>
               )}
-              {step === "portfolio" ? "Add Transaction" : `Add Transaction — ${selectedPortfolio?.name}`}
+              {step === "portfolio"
+                ? "Add Transaction"
+                : `Add Transaction — ${selectedPortfolio?.name}`}
             </DialogTitle>
           </DialogHeader>
 
           {step === "portfolio" ? (
             <div className="space-y-2 py-2">
               <p className="text-sm text-muted-foreground mb-3">Select a portfolio:</p>
+
               {!portfolios.length && (
                 <p className="text-sm text-muted-foreground">No portfolios yet. Create one first.</p>
               )}
@@ -518,8 +542,12 @@ function DashboardAddTransactionDialog() {
                                     });
                                   }}
                                 >
-                                  <span className="font-mono font-semibold text-sm w-16 shrink-0">{h.symbol}</span>
-                                  <span className="text-muted-foreground text-xs truncate flex-1">{h.name}</span>
+                                  <span className="font-mono font-semibold text-sm w-16 shrink-0">
+                                    {h.symbol}
+                                  </span>
+                                  <span className="text-muted-foreground text-xs truncate flex-1">
+                                    {h.name}
+                                  </span>
                                   <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
                                     {h.market}
                                   </span>
@@ -546,8 +574,12 @@ function DashboardAddTransactionDialog() {
                                     });
                                   }}
                                 >
-                                  <span className="font-mono font-semibold text-sm w-16 shrink-0">{s.symbol}</span>
-                                  <span className="text-muted-foreground text-xs truncate flex-1">{s.name}</span>
+                                  <span className="font-mono font-semibold text-sm w-16 shrink-0">
+                                    {s.symbol}
+                                  </span>
+                                  <span className="text-muted-foreground text-xs truncate flex-1">
+                                    {s.name}
+                                  </span>
                                   <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
                                     {s.market}
                                   </span>
@@ -762,10 +794,17 @@ export default function Dashboard() {
 
   const fmt = (v: number) => fxFormat(v, displayCurrency);
 
-  const allPortfolioIds = useMemo(() => portfolios.map((p: any) => p.id), [portfolios]);
+  const allPortfolioIds = useMemo(
+    () => portfolios.map((p: any) => p.id).filter(Boolean),
+    [portfolios]
+  );
 
   const fxTotalCash = useMemo(
-    () => portfolios.reduce((sum: number, p: any) => sum + convert(p.cashBalance, p.baseCurrency), 0),
+    () =>
+      portfolios.reduce(
+        (sum: number, p: any) => sum + convert(Number(p.cashBalance ?? 0), p.baseCurrency),
+        0
+      ),
     [portfolios, convert]
   );
 
@@ -806,6 +845,8 @@ export default function Dashboard() {
       currentPrice: number;
       currency: string;
       txs: any[];
+      precomputedCurrentValue?: number;
+      precomputedInvested?: number;
     }> = [];
 
     const depositRecords: Array<{
@@ -841,7 +882,7 @@ export default function Dashboard() {
       const txByHoldingId = new Map<number, any[]>();
 
       pTxItems.forEach((tx: any) => {
-        if (!tx.holdingId || !HOLDING_TX_TYPES.has(tx.type)) return;
+        if (!tx?.holdingId || !HOLDING_TX_TYPES.has(tx.type)) return;
         if (!txByHoldingId.has(tx.holdingId)) txByHoldingId.set(tx.holdingId, []);
         txByHoldingId.get(tx.holdingId)!.push(tx);
       });
@@ -883,7 +924,7 @@ export default function Dashboard() {
     });
 
     return computePortfolioMetrics(holdingEntries, depositRecords, convertFn, cashRecords);
-  }, [allHoldingsQueries, allTxQueries, portfolios, allPortfolioIds, convert]);
+  }, [allPortfolioIds, allHoldingsQueries, allTxQueries, portfolios, convert]);
 
   const fifoLoading =
     allPortfolioIds.length > 0 &&
@@ -930,7 +971,7 @@ export default function Dashboard() {
         const txByHoldingId = new Map<number, any[]>();
 
         pTxItems.forEach((tx: any) => {
-          if (!tx.holdingId || !HOLDING_TX_TYPES.has(tx.type)) return;
+          if (!tx?.holdingId || !HOLDING_TX_TYPES.has(tx.type)) return;
           if (!txByHoldingId.has(tx.holdingId)) txByHoldingId.set(tx.holdingId, []);
           txByHoldingId.get(tx.holdingId)!.push(tx);
         });
@@ -970,7 +1011,13 @@ export default function Dashboard() {
             currency,
           }));
 
-        const metrics = computePortfolioMetrics(holdingEntries, depositRecords, convertFn, pCashRecords);
+        const metrics = computePortfolioMetrics(
+          holdingEntries,
+          depositRecords,
+          convertFn,
+          pCashRecords
+        );
+
         const apiSlice = allocation.find((s: any) => s.portfolioId === pf.id) ?? {};
 
         return {
@@ -1046,7 +1093,9 @@ export default function Dashboard() {
           title="Total Cash"
           value={fmt(fxTotalCash)}
           subtitle={
-            grandTotal > 0 ? `${formatPercent((fxTotalCash / grandTotal) * 100)} of total` : undefined
+            grandTotal > 0
+              ? `${formatPercent((fxTotalCash / grandTotal) * 100)} of total`
+              : undefined
           }
           loading={loadingSummary}
         />
@@ -1086,15 +1135,17 @@ export default function Dashboard() {
             {loadingAllocation ? (
               <Skeleton className="w-full h-[200px]" />
             ) : (() => {
+                const safeAllocation = toArray<any>(fxAdjustedAllocation);
+
                 const sliceValue = (a: any) =>
                   pieView === "assets" ? (a.currentValue ?? a.value ?? 0) : (a.value ?? 0);
 
-                const totalAllocValue = fxAdjustedAllocation.reduce(
+                const totalAllocValue = safeAllocation.reduce(
                   (s: number, a: any) => s + sliceValue(a),
                   0
                 );
 
-                const allocWithWeight = fxAdjustedAllocation.map((a: any, i: number) => ({
+                const allocWithWeight = safeAllocation.map((a: any, i: number) => ({
                   ...a,
                   weight: totalAllocValue > 0 ? (sliceValue(a) / totalAllocValue) * 100 : 0,
                   color: a.color || PIE_COLORS[i % PIE_COLORS.length],
@@ -1105,7 +1156,8 @@ export default function Dashboard() {
                   return <p className="text-sm text-muted-foreground py-4">No holdings yet.</p>;
                 }
 
-                const active = activeAllocIdx !== null ? allocWithWeight[activeAllocIdx] : null;
+                const active =
+                  activeAllocIdx !== null ? allocWithWeight[activeAllocIdx] ?? null : null;
 
                 return (
                   <div className="flex flex-col md:flex-row md:h-[260px] gap-3">
@@ -1129,7 +1181,9 @@ export default function Dashboard() {
                               <Cell
                                 key={`cell-${index}`}
                                 fill={entry.color}
-                                opacity={activeAllocIdx === null || activeAllocIdx === index ? 1 : 0.35}
+                                opacity={
+                                  activeAllocIdx === null || activeAllocIdx === index ? 1 : 0.35
+                                }
                               />
                             ))}
                           </Pie>
@@ -1159,12 +1213,15 @@ export default function Dashboard() {
                     <div className="flex md:hidden w-full gap-0">
                       {allocWithWeight.map((a: any, i: number) => (
                         <button
-                          key={a.label}
+                          key={`${a.label}-${i}`}
                           onClick={() => setActiveAllocIdx((prev) => (prev === i ? null : i))}
                           className="flex-1 min-w-0 flex flex-col items-center gap-0.5 px-1 py-1.5 rounded"
                           style={{ background: activeAllocIdx === i ? `${a.color}15` : undefined }}
                         >
-                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: a.color }} />
+                          <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ background: a.color }}
+                          />
                           <span className="text-[9px] text-muted-foreground truncate w-full text-center leading-none">
                             {a.label}
                           </span>
@@ -1181,15 +1238,24 @@ export default function Dashboard() {
                     <div className="hidden md:flex flex-col justify-center gap-2.5 flex-1 min-w-0">
                       {allocWithWeight.map((a: any, i: number) => (
                         <button
-                          key={a.label}
+                          key={`${a.label}-${i}`}
                           onClick={() => setActiveAllocIdx((prev) => (prev === i ? null : i))}
                           className="flex items-center gap-2 text-sm min-w-0 w-full text-left rounded px-1 py-0.5 hover:bg-muted/30"
                         >
-                          <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: a.color }} />
-                          <span className="text-muted-foreground text-xs flex-1 truncate">{a.label}</span>
+                          <div
+                            className="w-3 h-3 rounded-sm flex-shrink-0"
+                            style={{ background: a.color }}
+                          />
+                          <span className="text-muted-foreground text-xs flex-1 truncate">
+                            {a.label}
+                          </span>
                           <div className="text-right shrink-0">
-                            <div className="font-mono text-xs font-medium">{fmt(a._displayValue)}</div>
-                            <div className="text-[10px] text-muted-foreground">{a.weight.toFixed(1)}%</div>
+                            <div className="font-mono text-xs font-medium">
+                              {fmt(a._displayValue)}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground">
+                              {a.weight.toFixed(1)}%
+                            </div>
                           </div>
                         </button>
                       ))}
@@ -1218,8 +1284,8 @@ export default function Dashboard() {
                 {!upcomingDividends.length ? (
                   <p className="text-sm text-muted-foreground">No upcoming dividends.</p>
                 ) : (
-                  upcomingDividends.slice(0, 5).map((div: any) => (
-                    <div key={div.id} className="flex items-center justify-between gap-3">
+                  upcomingDividends.slice(0, 5).map((div: any, idx: number) => (
+                    <div key={div.id ?? idx} className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <div className="font-medium text-sm truncate">{div.symbol}</div>
                         <div className="text-xs text-muted-foreground font-mono">
