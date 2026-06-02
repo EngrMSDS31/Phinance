@@ -77,7 +77,11 @@ function DashboardAddTransactionDialog() {
         (h.name ?? "").toLowerCase().includes(debouncedQuery.toLowerCase())
       )
     : [];
-  const existingSet = new Set(existingMatches.map((h: any) => `${h.symbol}:${h.market}`));
+  const existingSet = new Set(
+  (Array.isArray(existingMatches) ? existingMatches : []).map(
+    (h: any) => `${h.symbol}:${h.market}`
+  )
+);
   const liveSuggestions = (searchResults ?? []).filter(r => !existingSet.has(`${r.symbol}:${r.market}`));
 
   useEffect(() => {
