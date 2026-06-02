@@ -40,7 +40,7 @@ import { Plus, RefreshCw, Search, X, ChevronLeft } from "lucide-react";
 import { useQueryClient, useQueries } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
-const BASE_URL = import.meta.env.BASE_URL?.replace(//$/, "") || "";
+const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
 type DashSymbol = {
   id?: number;
