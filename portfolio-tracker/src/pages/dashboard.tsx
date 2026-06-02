@@ -799,14 +799,14 @@ export default function Dashboard() {
   [portfolios],
 );
   const fxTotalCash = useMemo(
-    () =>
-      portfolios.reduce(
-        (sum: number, p: any) => sum + convert(Number(p.cashBalance ?? 0), p.baseCurrency),
-        0
-      ),
-    [portfolios, convert]
-  );
-
+  () =>
+    (Array.isArray(portfolios) ? portfolios : []).reduce(
+      (sum: number, p: any) => sum + convert(Number(p.cashBalance ?? 0), p.baseCurrency),
+      0
+    ),
+  [portfolios, convert]
+);
+ 
   const allHoldingsQueries = useQueries({
     queries: allPortfolioIds.map((id) => ({
       queryKey: ["analytics-all-holdings", id],
