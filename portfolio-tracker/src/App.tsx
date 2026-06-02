@@ -1,12 +1,9 @@
 import { Switch, Route, Router as WouterRouter, useLocation, Redirect } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ClerkProvider, SignIn, SignUp, Show, useClerk, ClerkLoading } from "@clerk/react";
-import { dark } from "@clerk/themes";
-import { publishableKeyFromHost } from "@clerk/react/internal";
-import { useEffect, useRef, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { SignIn, SignUp, Show, useClerk, ClerkLoading } from "@clerk/react";
+import { useEffect, useRef } from "react";
 
 import { Layout } from "@/components/layout";
 import { FxProvider } from "@/lib/fx-context";
@@ -30,107 +27,10 @@ import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
 
-const clerkPubKey = publishableKeyFromHost(
-  window.location.hostname,
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-);
-const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
-const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
-
-function stripBase(path: string): string {
-  return basePath && path.startsWith(basePath)
-    ? path.slice(basePath.length) || "/"
-    : path;
-}
-
-if (!clerkPubKey) {
-  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env file");
-}
-
-const CLERK_COMMON_OPTIONS = {
-  logoPlacement: "inside" as const,
-  logoLinkUrl: basePath || "/",
-};
-const CLERK_COMMON_VARS = {
-  colorPrimary: "hsl(217.2, 91.2%, 59.8%)",
-  colorDanger: "hsl(0, 62.8%, 50%)",
-  fontFamily: "Inter, sans-serif",
-  borderRadius: "0.375rem",
-};
-
-const darkClerkAppearance = {
-  baseTheme: dark,
-  options: CLERK_COMMON_OPTIONS,
-  variables: {
-    ...CLERK_COMMON_VARS,
-    colorBackground: "hsl(222, 47%, 5%)",
-    colorInputBackground: "hsl(217.2, 32.6%, 17.5%)",
-    colorText: "#f0f4ff",
-    colorTextSecondary: "#94a3b8",
-    colorInputText: "#f0f4ff",
-    colorNeutral: "#f0f4ff",
-  },
-  elements: {
-    rootBox: "w-full flex justify-center",
-    cardBox: "rounded-xl overflow-hidden shadow-2xl border border-white/10",
-    card: { backgroundColor: "hsl(222,47%,7%)", boxShadow: "none" },
-    footer: { backgroundColor: "hsl(222,47%,7%)", borderTop: "1px solid rgba(255,255,255,0.08)" },
-    formButtonPrimary: { backgroundColor: "hsl(217.2,91.2%,59.8%)", color: "white" },
-    formFieldInput: { backgroundColor: "hsl(217.2,32.6%,15%)", color: "#f0f4ff", borderColor: "rgba(255,255,255,0.15)" },
-    formFieldLabel: { color: "#94a3b8" },
-    socialButtonsBlockButton: { border: "1px solid rgba(255,255,255,0.15)", backgroundColor: "rgba(255,255,255,0.04)", color: "#f0f4ff" },
-    socialButtonsBlockButtonText: { color: "#f0f4ff" },
-    dividerLine: { backgroundColor: "rgba(255,255,255,0.08)" },
-    dividerText: { color: "#64748b" },
-    headerTitle: { color: "#f0f4ff", fontWeight: "600" },
-    headerSubtitle: { color: "#94a3b8" },
-    identityPreviewText: { color: "#f0f4ff" },
-    formHeaderTitle: { color: "#f0f4ff" },
-    footerActionText: { color: "#94a3b8" },
-    footerActionLink: { color: "hsl(217.2,91.2%,59.8%)" },
-    alternativeMethodsBlockButton: { color: "#f0f4ff", borderColor: "rgba(255,255,255,0.15)" },
-    otpCodeFieldInput: { color: "#f0f4ff", backgroundColor: "hsl(217.2,32.6%,15%)", borderColor: "rgba(255,255,255,0.15)" },
-  },
-};
-
-const lightClerkAppearance = {
-  options: CLERK_COMMON_OPTIONS,
-  variables: {
-    ...CLERK_COMMON_VARS,
-    colorBackground: "hsl(0, 0%, 100%)",
-    colorInputBackground: "hsl(210, 40%, 98%)",
-    colorText: "hsl(222.2, 47.4%, 11.2%)",
-    colorTextSecondary: "hsl(215.4, 16.3%, 46.9%)",
-    colorInputText: "hsl(222.2, 47.4%, 11.2%)",
-    colorNeutral: "hsl(222.2, 47.4%, 11.2%)",
-  },
-  elements: {
-    rootBox: "w-full flex justify-center",
-    cardBox: "rounded-xl overflow-hidden shadow-lg border border-border",
-    card: { backgroundColor: "hsl(0,0%,100%)", boxShadow: "none" },
-    footer: { backgroundColor: "hsl(210,40%,98%)", borderTop: "1px solid hsl(214.3,31.8%,91.4%)" },
-    formButtonPrimary: { backgroundColor: "hsl(217.2,91.2%,59.8%)", color: "white" },
-    formFieldInput: { backgroundColor: "white", color: "hsl(222.2,47.4%,11.2%)", borderColor: "hsl(214.3,31.8%,91.4%)" },
-    formFieldLabel: { color: "hsl(215.4,16.3%,46.9%)" },
-    socialButtonsBlockButton: { border: "1px solid hsl(214.3,31.8%,91.4%)", backgroundColor: "white", color: "hsl(222.2,47.4%,11.2%)" },
-    socialButtonsBlockButtonText: { color: "hsl(222.2,47.4%,11.2%)" },
-    dividerLine: { backgroundColor: "hsl(214.3,31.8%,91.4%)" },
-    dividerText: { color: "hsl(215.4,16.3%,46.9%)" },
-    headerTitle: { color: "hsl(222.2,47.4%,11.2%)", fontWeight: "600" },
-    headerSubtitle: { color: "hsl(215.4,16.3%,46.9%)" },
-    identityPreviewText: { color: "hsl(222.2,47.4%,11.2%)" },
-    formHeaderTitle: { color: "hsl(222.2,47.4%,11.2%)" },
-    footerActionText: { color: "hsl(215.4,16.3%,46.9%)" },
-    footerActionLink: { color: "hsl(217.2,91.2%,59.8%)" },
-    alternativeMethodsBlockButton: { color: "hsl(222.2,47.4%,11.2%)", borderColor: "hsl(214.3,31.8%,91.4%)" },
-    otpCodeFieldInput: { color: "hsl(222.2,47.4%,11.2%)", backgroundColor: "white", borderColor: "hsl(214.3,31.8%,91.4%)" },
-  },
-};
-
 function SignInPage() {
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
-      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
+      <SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" />
     </div>
   );
 }
@@ -138,7 +38,7 @@ function SignInPage() {
 function SignUpPage() {
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
-      <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
+      <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" />
     </div>
   );
 }
@@ -207,10 +107,7 @@ function ClerkQueryClientCacheInvalidator() {
   useEffect(() => {
     const unsubscribe = addListener(({ user }) => {
       const userId = user?.id ?? null;
-      if (
-        prevUserIdRef.current !== undefined &&
-        prevUserIdRef.current !== userId
-      ) {
+      if (prevUserIdRef.current !== undefined && prevUserIdRef.current !== userId) {
         qc.clear();
       }
       prevUserIdRef.current = userId;
@@ -231,69 +128,34 @@ function ProtectedRoutes() {
       </ClerkLoading>
       <Show when="signed-in">
         <PrivacyProvider>
-        <FxProvider>
-        <Layout>
-          <Switch>
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/portfolios" component={Portfolios} />
-            <Route path="/portfolios/:id" component={PortfolioDetail} />
-            <Route path="/transactions" component={Transactions} />
-            <Route path="/watchlists" component={Watchlists} />
-            <Route path="/alerts" component={Alerts} />
-            <Route path="/dividend-calendar" component={DividendCalendar} />
-            <Route path="/csv" component={CsvImportExport} />
-            <Route path="/tax-report" component={TaxReport} />
-            <Route path="/notes" component={Notes} />
-            <Route path="/recurring" component={Recurring} />
-            <Route path="/sizer" component={Sizer} />
-            <Route path="/analytics" component={Analytics} />
-            <Route path="/settings" component={Settings} />
-            <Route path="/feedback" component={Feedback} />
-            <Route component={NotFound} />
-          </Switch>
-        </Layout>
-        </FxProvider>
+          <FxProvider>
+            <Layout>
+              <Switch>
+                <Route path="/dashboard" component={Dashboard} />
+                <Route path="/portfolios" component={Portfolios} />
+                <Route path="/portfolios/:id" component={PortfolioDetail} />
+                <Route path="/transactions" component={Transactions} />
+                <Route path="/watchlists" component={Watchlists} />
+                <Route path="/alerts" component={Alerts} />
+                <Route path="/dividend-calendar" component={DividendCalendar} />
+                <Route path="/csv" component={CsvImportExport} />
+                <Route path="/tax-report" component={TaxReport} />
+                <Route path="/notes" component={Notes} />
+                <Route path="/recurring" component={Recurring} />
+                <Route path="/sizer" component={Sizer} />
+                <Route path="/analytics" component={Analytics} />
+                <Route path="/settings" component={Settings} />
+                <Route path="/feedback" component={Feedback} />
+                <Route component={NotFound} />
+              </Switch>
+            </Layout>
+          </FxProvider>
         </PrivacyProvider>
       </Show>
       <Show when="signed-out">
         <Redirect to="/" />
       </Show>
     </>
-  );
-}
-
-function ClerkProviderWithRoutes() {
-  const [, setLocation] = useLocation();
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
-
-  useEffect(() => {
-    const obs = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    });
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => obs.disconnect();
-  }, []);
-
-  return (
-    <ClerkProvider
-      publishableKey={clerkPubKey}
-      proxyUrl={clerkProxyUrl}
-      appearance={isDark ? darkClerkAppearance : lightClerkAppearance}
-      signInUrl={`${basePath}/sign-in`}
-      signUpUrl={`${basePath}/sign-up`}
-      routerPush={(to) => setLocation(stripBase(to))}
-      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
-    >
-      <QueryClientProvider client={queryClient}>
-        <ClerkQueryClientCacheInvalidator />
-        <Switch>
-          <Route path="/" component={HomeRedirect} />
-          <Route path="/sign-in/*?" component={SignInPage} />
-          <Route path="/sign-up/*?" component={SignUpPage} />
-          <Route path="/*" component={ProtectedRoutes} />
-        </Switch>
-      </QueryClientProvider>
-    </ClerkProvider>
   );
 }
 
@@ -313,8 +175,16 @@ function App() {
 
   return (
     <TooltipProvider>
-      <WouterRouter base={basePath}>
-        <ClerkProviderWithRoutes />
+      <WouterRouter>
+        <QueryClientProvider client={queryClient}>
+          <ClerkQueryClientCacheInvalidator />
+          <Switch>
+            <Route path="/" component={HomeRedirect} />
+            <Route path="/sign-in/*?" component={SignInPage} />
+            <Route path="/sign-up/*?" component={SignUpPage} />
+            <Route path="/*" component={ProtectedRoutes} />
+          </Switch>
+        </QueryClientProvider>
       </WouterRouter>
       <Toaster />
     </TooltipProvider>
