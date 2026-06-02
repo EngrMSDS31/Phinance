@@ -30,7 +30,12 @@ const queryClient = new QueryClient();
 function SignInPage() {
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
-      <SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" />
+      <SignIn
+        routing="path"
+        path="/sign-in"
+        signUpUrl="/sign-up"
+        fallbackRedirectUrl="/dashboard"
+      />
     </div>
   );
 }
@@ -38,7 +43,12 @@ function SignInPage() {
 function SignUpPage() {
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
-      <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" />
+      <SignUp
+        routing="path"
+        path="/sign-up"
+        signInUrl="/sign-in"
+        fallbackRedirectUrl="/dashboard"
+      />
     </div>
   );
 }
