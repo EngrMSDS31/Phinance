@@ -141,7 +141,7 @@ const selectedPortfolio = portfolios.find((p: any) => p.id === selectedPortfolio
 
   const handleSelectPortfolio = (id: number) => {
     setSelectedPortfolioId(id);
-    const p = portfolios?.find(pp => pp.id === id);
+    const p = portfolios.find((pp: any) => pp.id === id);
     setTxCurrency(p?.baseCurrency || "USD");
     setStep("form");
   };
