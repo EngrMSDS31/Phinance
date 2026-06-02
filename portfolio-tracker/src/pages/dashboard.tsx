@@ -398,11 +398,11 @@ function DashboardAddTransactionDialog() {
             <div className="space-y-2 py-2">
               <p className="text-sm text-muted-foreground mb-3">Select a portfolio:</p>
 
-              {!portfolios.length && (
-                <p className="text-sm text-muted-foreground">No portfolios yet. Create one first.</p>
-              )}
+              {(!Array.isArray(portfolios) || portfolios.length === 0) && (
+  <p className="text-sm text-muted-foreground">No portfolios yet. Create one first.</p>
+)}
 
-              {portfolios.map((p: any) => (
+{(Array.isArray(portfolios) ? portfolios : []).map((p: any) => (
                 <button
                   key={p.id}
                   onClick={() => handleSelectPortfolio(p.id)}
