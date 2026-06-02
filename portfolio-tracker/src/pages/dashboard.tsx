@@ -32,9 +32,24 @@ function DashboardAddTransactionDialog() {
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const { data: portfolios } = useListPortfolios();
-  const { data: holdings } = useListHoldings(selectedPortfolioId ?? 0, { query: { enabled: !!selectedPortfolioId } as any });
-  const selectedPortfolio = portfolios?.find(p => p.id === selectedPortfolioId);
+  const { data: portfoliosData } = useListPortfolios();
+const { data: holdingsData } = useListHoldings(selectedPortfolioId ?? 0, {
+  query: { enabled: !!selectedPortfolioId } as any,
+});
+
+const portfolios = Array.isArray(portfoliosData)
+  ? portfoliosData
+  : Array.isArray((portfoliosData as any)?.data)
+    ? (portfoliosData as any).data
+    : [];
+
+const holdings = Array.isArray(holdingsData)
+  ? holdingsData
+  : Array.isArray((holdingsData as any)?.data)
+    ? (holdingsData as any).data
+    : [];
+
+const selectedPortfolio = portfolios.find((p: any) => p.id === selectedPortfolioId);
   const createTx = useCreateTransaction();
 
   // Portfolio rates (support 4dp)
