@@ -795,10 +795,9 @@ export default function Dashboard() {
   const fmt = (v: number) => fxFormat(v, displayCurrency);
 
   const allPortfolioIds = useMemo(
-    () => portfolios.map((p: any) => p.id).filter(Boolean),
-    [portfolios]
-  );
-
+  () => (Array.isArray(portfolios) ? portfolios.map((p) => p.id) : []),
+  [portfolios],
+);
   const fxTotalCash = useMemo(
     () =>
       portfolios.reduce(
